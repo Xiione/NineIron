@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="ActualPlugin:jar">
+    <output-path>D:/Hamo garbage/javawork/Spigot/plugins</output-path>
+    <root id="archive" name="ActualPlugin.jar">
+      <element id="module-output" name="ActualPlugin" />
+    </root>
+  </artifact>
+</component>

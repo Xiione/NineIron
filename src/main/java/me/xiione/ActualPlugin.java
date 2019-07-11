@@ -6,8 +6,7 @@ public class ActualPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getServer().getPluginManager().registerEvents(new AxeRightClickListener(this), this);
-        getServer().getPluginManager().registerEvents(new ProjectileDamageListener(), this);
+        getServer().getPluginManager().registerEvents(new NineIronListener(this), this);
     }
 
     public void onDisable() {

@@ -1,4 +1,5 @@
 name: NineIron
-version: 1.0
+version: 1.2
+author: Xiione
+api-version: 1.14
 main: me.xiione.ActualPlugin
-api-version: 1.13

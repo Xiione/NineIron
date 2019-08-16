@@ -9,6 +9,7 @@ public class ActualPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new NineIronListener(this), this);
     }
 
+    @Override
     public void onDisable() {
 
     }

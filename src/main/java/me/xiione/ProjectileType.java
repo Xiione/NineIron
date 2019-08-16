@@ -7,7 +7,9 @@ import org.bukkit.entity.EntityType;
 public enum ProjectileType {
     SNOWBALL(Material.SNOWBALL, EntityType.SNOWBALL, Sound.BLOCK_SNOW_BREAK),
     EGG(Material.EGG, EntityType.EGG, Sound.BLOCK_STONE_HIT),
-    ENDER_PEARL(Material.ENDER_PEARL, EntityType.ENDER_PEARL, Sound.ENTITY_ENDER_EYE_DEATH);
+    ENDER_PEARL(Material.ENDER_PEARL, EntityType.ENDER_PEARL, Sound.ENTITY_ENDER_EYE_DEATH),
+    SPLASH_POTION(Material.SPLASH_POTION, EntityType.SPLASH_POTION, Sound.BLOCK_GLASS_HIT),
+    LINGERING_POTION(Material.LINGERING_POTION, EntityType.SPLASH_POTION, Sound.BLOCK_GLASS_HIT);
 
     private Material projectileMaterial;
     private EntityType projectile;

@@ -53,10 +53,17 @@ public class NineIronListener implements Listener {
 
                     for (ProjectileType type : ProjectileType.values()) {
                         if (type.getProjectileMaterial() == offHandItem.getType()) {
-                            Entity projectile = w.spawnEntity(p.getEyeLocation(), type.getProjectile());
-                            projectile.setVelocity(p.getEyeLocation().getDirection().multiply(knockbackVelocity));
-                            projectile.setMetadata(DAMAGE, new FixedMetadataValue(plugin, 2 + (kbLevel * 2)));
-                            ((Projectile) projectile).setShooter(p);
+                            if(type == ProjectileType.SPLASH_POTION || type == ProjectileType.LINGERING_POTION) {
+                                Entity projectile = w.spawnEntity(p.getEyeLocation(), type.getProjectile());
+                                projectile.setVelocity(p.getEyeLocation().getDirection().multiply(knockbackVelocity / 2)); //halve velocity for splash/lingering pots
+                                ((ThrownPotion) projectile).setItem(offHandItem);                                          //no need to include damage metadata for pots
+                                ((Projectile) projectile).setShooter(p);
+                            } else {
+                                Entity projectile = w.spawnEntity(p.getEyeLocation(), type.getProjectile());
+                                projectile.setVelocity(p.getEyeLocation().getDirection().multiply(knockbackVelocity));
+                                projectile.setMetadata(DAMAGE, new FixedMetadataValue(plugin, 2 + (kbLevel * 2)));
+                                ((Projectile) projectile).setShooter(p);
+                            }
                         }
                     }
 

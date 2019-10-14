@@ -2,23 +2,24 @@ package me.xiione;
 
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 
 public enum ProjectileType {
-    SNOWBALL(Material.SNOWBALL, EntityType.SNOWBALL, Sound.BLOCK_SNOW_BREAK),
-    EGG(Material.EGG, EntityType.EGG, Sound.BLOCK_STONE_HIT),
-    ENDER_PEARL(Material.ENDER_PEARL, EntityType.ENDER_PEARL, Sound.ENTITY_ENDER_EYE_DEATH),
-    SPLASH_POTION(Material.SPLASH_POTION, EntityType.SPLASH_POTION, Sound.BLOCK_GLASS_HIT),
-    LINGERING_POTION(Material.LINGERING_POTION, EntityType.SPLASH_POTION, Sound.BLOCK_GLASS_HIT);
+    SNOWBALL(Material.SNOWBALL, EntityType.SNOWBALL, "snowball"),
+    EGG(Material.EGG, EntityType.EGG, "egg"),
+    ENDER_PEARL(Material.ENDER_PEARL, EntityType.ENDER_PEARL, "enderpearl"),
+    SPLASH_POTION(Material.SPLASH_POTION, EntityType.SPLASH_POTION, "splash-potion"),
+    LINGERING_POTION(Material.LINGERING_POTION, EntityType.SPLASH_POTION, "lingering-potion");
 
     private Material projectileMaterial;
     private EntityType projectile;
-    private Sound impactSound;
+    private String name;
 
-    ProjectileType(Material projectileMaterial, EntityType projectile, Sound impactSound) {
+    ProjectileType(Material projectileMaterial, EntityType projectile, String name) {
         this.projectileMaterial = projectileMaterial;
         this.projectile = projectile;
-        this.impactSound = impactSound;
+        this.name = name;
     }
 
     /**
@@ -36,6 +37,21 @@ public enum ProjectileType {
         return false;
     }
 
+    public Sound getProjectileSound(FileConfiguration config) { //get impact sound
+        String[] values = config.getString(name + "-launch-sound").split("-"); //split config values
+        return Sound.valueOf(values[0]);
+    }
+
+    public float getProjectileSoundVolume(FileConfiguration config) { //get impact sound volume
+        String[] values = config.getString(name + "-launch-sound").split("-");
+        return Float.valueOf(values[1]);
+    }
+
+    public float getProjectileSoundPitch(FileConfiguration config) { //get impact sound pitch
+        String[] values = config.getString(name + "-launch-sound").split("-");
+        return Float.valueOf(values[2]);
+    }
+
     /**
      * Returns the projectile material.
      * @return
@@ -48,9 +64,4 @@ public enum ProjectileType {
      */
     public EntityType getProjectile() { return projectile; }
 
-    /**
-     * Returns the impact sound when the projectile hits something.
-     * @return
-     */
-    public Sound getImpactSound() { return  impactSound; }
 }

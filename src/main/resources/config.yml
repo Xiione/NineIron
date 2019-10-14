@@ -1,0 +1,57 @@
+#Default configuration with extra comments available at https://spigotmc.org/wiki/convenienchant-config
+
+#Should the plugin check for a newer version on enable?
+#Players with the proper permissions will be notified on join.
+notify-update: true
+
+## NineIron Config ##
+
+#What items should be allowed to be used as a Nine Iron?
+#Values must be Materials.
+#Find the Spigot material enums here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+nineiron-items:
+  - "WOODEN_AXE"
+  - "STONE_AXE"
+  - "IRON_AXE"
+  - "GOLDEN_AXE"
+  - "DIAMOND_AXE"
+
+#Should an enchantment be checked for to let an item with the correct material launch projectiles?
+check-enchantment: true
+
+#What enchantment should be checked for to let an item with the correct material launch projectiles?
+#Find the Spigot enchantment enums here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/enchantments/Enchantment.html
+#Only applies if check-enchantment is true.
+nineiron-enchantment: "KNOCKBACK"
+
+#By default, how strong should the projectile launch be?
+#Only applies if check-enchantment is false.
+nineiron-level-default: 1
+
+#How long should the delay between right-clicking and the actual launch of the projectile be, in ticks?
+nineiron-launch-delay: 10
+
+#Should particles be spawned at the location of the player when a projectile is launched?
+spawn-particles: true
+
+#How much durability should be taken on projectile launch?
+#Must be equal to or greater than 0.
+nineiron-tool-damage: 2
+
+#Should players be allowed to launch x projectile?
+allow-launch-snowball: true
+allow-launch-egg: true
+allow-launch-enderpearl: true
+allow-launch-splash-potion: true
+allow-launch-lingering-potion: true
+
+#What sounds should each projectile type play when launched?
+#Use the following format: "SOUND_ENUM-VOLUME-PITCH"
+#Find the Spigot sound enums here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+#Set volume to 0 to disable.
+snowball-launch-sound: "BLOCK_SNOW_BREAK-1.0-1.0"
+egg-launch-sound: "BLOCK_STONE_HIT-1.0-1.0"
+enderpearl-launch-sound: "ENTITY_ENDER_EYE_DEATH-1.0-1.0"
+splash-potion-launch-sound: "BLOCK_GLASS_HIT-1.0-1.0"
+lingering-potion-launch-sound: "BLOCK_GLASS_HIT-1.0-1.0"
+general-launch-sound: "ENTITY_PLAYER_ATTACK_STRONG-1.0-1.0"

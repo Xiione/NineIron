@@ -14,12 +14,12 @@ public enum ProjectileType {
 
     private Material projectileMaterial;
     private EntityType projectile;
-    private String name;
+    private String key;
 
     ProjectileType(Material projectileMaterial, EntityType projectile, String name) {
         this.projectileMaterial = projectileMaterial;
         this.projectile = projectile;
-        this.name = name;
+        this.key = name;
     }
 
     /**
@@ -38,19 +38,21 @@ public enum ProjectileType {
     }
 
     public Sound getProjectileSound(FileConfiguration config) { //get impact sound
-        String[] values = config.getString(name + "-launch-sound").split("-"); //split config values
+        String[] values = config.getString(key + "-launch-sound").split("-"); //split config values
         return Sound.valueOf(values[0]);
     }
 
     public float getProjectileSoundVolume(FileConfiguration config) { //get impact sound volume
-        String[] values = config.getString(name + "-launch-sound").split("-");
+        String[] values = config.getString(key + "-launch-sound").split("-");
         return Float.valueOf(values[1]);
     }
 
     public float getProjectileSoundPitch(FileConfiguration config) { //get impact sound pitch
-        String[] values = config.getString(name + "-launch-sound").split("-");
+        String[] values = config.getString(key + "-launch-sound").split("-");
         return Float.valueOf(values[2]);
     }
+
+
 
     /**
      * Returns the projectile material.
@@ -63,5 +65,11 @@ public enum ProjectileType {
      * @return
      */
     public EntityType getProjectile() { return projectile; }
+
+    /**
+     * Returns the key name of the projectile.
+     * @return
+     */
+    public String getKey() { return key; }
 
 }

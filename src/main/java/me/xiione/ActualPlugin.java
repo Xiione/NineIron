@@ -1,6 +1,5 @@
 package me.xiione;
 
-import io.github.xiione.ConfigUpdater;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ActualPlugin extends JavaPlugin {
@@ -9,7 +8,8 @@ public class ActualPlugin extends JavaPlugin {
     public void onEnable() {
         final NineIronListener nineIronListener = new NineIronListener(this);
         this.saveDefaultConfig();
-        ConfigUpdater.updateConfig(this);
+
+        this.getCommand("nineiron").setExecutor(nineIronListener);
 
         getServer().getPluginManager().registerEvents(nineIronListener, this);
         nineIronListener.loadConfigs(false);

@@ -3,3 +3,13 @@ version: 1.2
 author: Xiione
 api-version: 1.14
 main: me.xiione.ActualPlugin
+
+commands:
+  nineiron:
+    description: Main command
+
+permissions:
+  nineiron.admin:
+    default: op
+  nineiron.notifyupdate:
+    default: op

@@ -1,10 +1,13 @@
 package me.xiione;
 
-import io.github.xiione.ConfigUpdater;
 import io.github.xiione.UpdateCheck;
 import org.bukkit.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -20,20 +23,21 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 import static org.bukkit.Sound.ENTITY_ITEM_BREAK;
 import static org.bukkit.enchantments.Enchantment.DURABILITY;
 
-public class NineIronListener implements Listener {
-    //TODO add basic commands and stuff
-
+public class NineIronListener implements Listener, CommandExecutor, TabCompleter {
+    //TODO fix vanilla ender pearl throwing bug :/
+    //TODO fix offhand checking order (config toggles for vanilla behavior)
     private ActualPlugin plugin;
     private final String NINE_IRON_COOLDOWN = "NIcooldown";
     private final String DAMAGE = "NIdamage";
     private final double PLUGIN_VERSION = 1.2;
-    public NineIronListener(ActualPlugin passedplugin) {
+    NineIronListener(ActualPlugin passedplugin) {
         this.plugin = passedplugin;
     }
 
@@ -42,10 +46,9 @@ public class NineIronListener implements Listener {
     private String nineiron_enchantment, general_launch_sound;
     private List<String> nineiron_items;
 
-    public void loadConfigs(boolean reload) {
+    void loadConfigs(boolean reload) {
         FileConfiguration config = plugin.getConfig();
         plugin.saveDefaultConfig(); //create the config if it does not exist
-        ConfigUpdater.updateConfig(plugin); //add any missing fields
         if (reload) {
             plugin.reloadConfig(); //if being issued via command, reload config values
         }
@@ -57,10 +60,10 @@ public class NineIronListener implements Listener {
         check_enchantment = config.getBoolean("check-enchantment");
         spawn_particles = config.getBoolean("spawn-particles");
 
-        nineiron_enchantment = config.getString("nineiron-enchantment");
+        nineiron_enchantment = config.getString("nineiron-enchantment").toLowerCase();
         general_launch_sound = config.getString("general-launch-sound");
 
-        nineiron_items = config.getStringList("nineiron_items");
+        nineiron_items = config.getStringList("nineiron-items");
     }
 
     @EventHandler
@@ -79,7 +82,7 @@ public class NineIronListener implements Listener {
                         double knockbackVelocity; //"level factor" for damage calculation
                         int kbLevel;
                         if (check_enchantment) {
-                            kbLevel = mainHandItem.getEnchantments().get(Enchantment.getByKey(new NamespacedKey(plugin, nineiron_enchantment))) - 1; //base velocity will be 2 at enchantment level 1
+                            kbLevel = mainHandItem.getEnchantments().get(EnchantmentWrapper.getByKey(NamespacedKey.minecraft(nineiron_enchantment))) - 1; //base velocity will be 2 at enchantment level 1
                         } else {
                             kbLevel = nineiron_level_default - 1;
                         }
@@ -87,8 +90,14 @@ public class NineIronListener implements Listener {
                         knockbackVelocity = 2 + kbLevel * 0.6; //increases velocity by 0.6 per level above base level
 
                         for (ProjectileType type : ProjectileType.values()) {
-                            if (type.getProjectileMaterial() == offHandItem.getType() && isValidToLaunch(p)) { //offhand is a valid item and player still valid to launch
-                                if(config.getBoolean("allow-launch-" + type.name())) { //offhand is allowed in config to be launched?
+//                            p.sendMessage(type.getProjectileMaterial().name() + " is the projectile material being tested for"); //TODO DEBUG
+//                            p.sendMessage(offHandItem.getType().name() + " is the material in your left hand");
+//                            p.sendMessage(Boolean.toString(type.getProjectileMaterial().equals(offHandItem.getType())) + ": are the Materials equal?");
+//                            p.sendMessage(Boolean.toString(isValidToLaunch(p)) + ": is still valid to launch?");
+//                            p.sendMessage("end this loop");
+
+                            if (type.getProjectileMaterial().equals(offHandItem.getType()) && isValidToLaunch(p)) { //offhand is a valid item and player still valid to launch
+                                if(config.getBoolean("allow-launch-" + type.getKey())) { //offhand is allowed in config to be launched?
                                     if (type == ProjectileType.SPLASH_POTION || type == ProjectileType.LINGERING_POTION) {
                                         Entity projectile = w.spawnEntity(p.getEyeLocation(), type.getProjectile());
                                         projectile.setVelocity(p.getEyeLocation().getDirection().multiply(knockbackVelocity / 2)); //halve velocity for splash/lingering pots
@@ -185,11 +194,70 @@ public class NineIronListener implements Listener {
             }
         }
         if (check_enchantment) { //should an enchantment be checked for?
-            if (mainHandItem.getEnchantments().containsKey(Enchantment.getByKey(new NamespacedKey(plugin, nineiron_enchantment))))
+            if (mainHandItem.getEnchantments().containsKey(EnchantmentWrapper.getByKey(NamespacedKey.minecraft(nineiron_enchantment))))
                 isValidEnchanted = true; //does the item in the main have the correct enchantment?
         } else isValidEnchanted = true;
 
         return (isValidMaterial && isValidEnchanted);
+    }
+
+    @Override
+    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
+        if (commandSender.hasPermission("nineiron.admin")) {
+            if (args.length == 0) {
+                commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&9NineIron " + PLUGIN_VERSION + " &7by Xiione"));
+                commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7https://www.spigotmc.org/resources/nineiron.69102/"));
+                commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&9Usage: &7/nineiron [help|reload]"));
+            } else switch (args[0].toLowerCase()) {
+                case "reload":
+                    if (args.length > 1) {
+                        commandSender.sendMessage(ChatColor.RED + "Too many arguments provided!");
+                        return true;
+                    } else {
+                        loadConfigs(true);
+                        commandSender.sendMessage(ChatColor.GREEN + "NineIron config reloaded!");
+                        return true;
+                    }
+                case "help":
+                    if (args.length > 1) {
+                        commandSender.sendMessage(ChatColor.RED + "Too many arguments provided!");
+                        return true;
+                    } else {
+                        commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7/nineiron&f: Show plugin info."));
+                        commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7/nineiron help&f: Show command usages."));
+                        commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7/nineiron reload&f: Reload the plugin configuration."));
+                        return true;
+                    }
+                default:
+                    commandSender.sendMessage(ChatColor.RED + "Unknown subcommand!");
+                    return true;
+            }
+            return false;
+        } else {
+            commandSender.sendMessage(ChatColor.RED + "No permission!");
+            return true;
+        }
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
+        if (command.getName().equalsIgnoreCase("nineiron")) {
+            List<String> emptyList = Arrays.asList("");
+            switch (args.length) {
+                case 1:
+                    return Arrays.asList("help", "reload");
+                case 2:
+                    switch (args[0].toLowerCase()) {
+                        case "help":
+                            return emptyList;
+                        case "reload":
+                            return emptyList;
+                    }
+                default:
+                    return emptyList;
+            }
+        }
+        return null;
     }
 }
 
